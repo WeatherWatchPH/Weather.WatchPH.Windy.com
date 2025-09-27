@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOME - Weather Watch PH</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background: #0077b6;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .header-left img.logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+    }
+    header a.home-link,
+    header a.satellite-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    header a.home-link img,
+    header a.satellite-link img {
+      width: 24px;
+      height: 24px;
+    }
+    iframe {
+      flex: 1;
+      width: 100%;
+      border: none;
+    }
+    footer {
+      background: #023e8a;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+    }
+    footer a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    footer a img {
+      width: 24px;
+      height: 24px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <img class="logo" src="https://i.ibb.co/mCzWLtVq/logo.png" alt="Weather Watch PH Logo">
+      WEATHER WATCH PH 🌤
+    </div>
+
+    <div class="header-right">
+      <!-- SATELLITE link -->
+      <a class="satellite-link" href="https://weatherwatchph.github.io/Weather.WatchPH/" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/535/535188.png" alt="Satellite Icon"> SATELLITE MAP
+      </a>
+
+      <!-- HOME link -->
+      <a class="home-link" href="https://weatherwatchph.github.io/Weather.Watch.PH/" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Home Icon"> HOME PAGE
+      </a>
+    </div>
+  </header>
+
+  <!-- Embedded windy.com -->
+  <iframe src="https://www.windy.com"></iframe>
+
+  <!-- Footer with Facebook links -->
+  <footer>
+    <a href="https://www.facebook.com/WeatherWatchPH1" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook Icon"> WEATHER WATCH PH
+    </a>
+    <a href="https://www.facebook.com/PAGASA.GOV.PH" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook Icon"> DOST-PAGASA
+    </a>
+  </footer>
+</body>
+</html>
