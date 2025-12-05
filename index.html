@@ -1,112 +1,142 @@
-<!DOCTYPE html>
-<html lang="en">
+</body>
+</html>
+<!doctype html>
+<html lang='en'>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HOME - Weather Watch PH</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    header {
-      background: #0077b6;
-      color: white;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      font-size: 24px;
-      font-weight: bold;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      justify-content: space-between;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    .header-left img.logo {
-      width: 50px;
-      height: 50px;
-      border-radius: 10px;
-    }
-    header a.home-link,
-    header a.satellite-link {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    header a.home-link img,
-    header a.satellite-link img {
-      width: 24px;
-      height: 24px;
-    }
-    iframe {
-      flex: 1;
-      width: 100%;
-      border: none;
-    }
-    footer {
-      background: #023e8a;
-      padding: 10px 20px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      align-items: center;
-      color: white;
-      font-weight: bold;
-    }
-    footer a {
-      color: white;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    footer a img {
-      width: 24px;
-      height: 24px;
-    }
-  </style>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Attendance Trial System</title>
+<style>
+*{box-sizing:border-box;font-family:system-ui}
+body{background:#f0f4f9;margin:0;padding:20px}
+.container{max-width:900px;margin:auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+h1{text-align:center;margin-top:0}
+nav{display:flex;gap:10px;margin-bottom:20px}
+nav button{flex:1;padding:12px;border:none;border-radius:6px;background:#2563eb;color:#fff;cursor:pointer;font-size:16px}
+section{display:none}
+section.active{display:block}
+input,button{padding:10px;font-size:16px;border-radius:6px}
+input{width:100%;border:1px solid #ccc;margin-bottom:10px}
+button.action{background:#2563eb;color:#fff;border:none;width:100%}
+.message{margin-top:15px;padding:12px;border-radius:6px;text-align:center}
+.success{background:#e6fff0;color:#0b6630}
+.error{background:#ffe6e6;color:#8b1a1a}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left}
+.deleteBtn{background:#e63946;color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer}
+</style>
 </head>
 <body>
-  <header>
-    <div class="header-left">
-      <img class="logo" src="https://i.ibb.co/mCzWLtVq/logo.png" alt="Weather Watch PH Logo">
-      WEATHER WATCH PH 🌤
-    </div>
+<div class='container'>
+<h1>Attendance Trial System</h1>
 
-    <div class="header-right">
-      <!-- SATELLITE link -->
-      <a class="satellite-link" href="https://weatherwatchph.github.io/Weather.WatchPH/" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/535/535188.png" alt="Satellite Icon"> SATELLITE MAP
-      </a>
+<nav>
+<button onclick="showPage('attendancePage')">Attendance</button>
+<button onclick="showPage('adminPage')">Admin Panel</button>
+</nav>
 
-      <!-- HOME link -->
-      <a class="home-link" href="https://weatherwatchph.github.io/Weather.Watch.PH/" target="_blank">
-        <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Home Icon"> HOME PAGE
-      </a>
-    </div>
-  </header>
+<section id='attendancePage' class='active'>
+<h2>Employee Time In / Time Out</h2>
+<input id='att_id' placeholder='Enter ID Number'>
+<button class='action' onclick='submitAttendance()'>Submit</button>
+<div id='att_msg' class='message'></div>
+</section>
 
-  <!-- Embedded zoom.earth -->
-  <iframe src="https://zoom.earth"></iframe>
+<section id='adminPage'>
+<h2>Admin Panel</h2>
+<input id='new_emp_id' placeholder='Employee ID'>
+<input id='new_emp_name' placeholder='Employee Name'>
+<button class='action' onclick='addEmployee()'>Add Employee</button>
 
-  <!-- Footer with Facebook links -->
-  <footer>
-    <a href="https://www.facebook.com/WeatherWatchPH1" target="_blank">
-      <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook Icon"> WEATHER WATCH PH
-    </a>
-    <a href="https://www.facebook.com/PAGASA.GOV.PH" target="_blank">
-      <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook Icon"> DOST-PAGASA
-    </a>
-  </footer>
+<h3>Employee List</h3>
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Action</th></tr></thead>
+<tbody id='emp_table'></tbody>
+</table>
+
+<h3>Attendance Records</h3>
+<div id='att_records'></div>
+</section>
+</div>
+
+<script>
+// LOCAL STORAGE DATABASE
+let employees = JSON.parse(localStorage.getItem('employees')||'{}');
+let attendance = JSON.parse(localStorage.getItem('attendance')||'{}');
+
+function save(){
+ localStorage.setItem('employees',JSON.stringify(employees));
+ localStorage.setItem('attendance',JSON.stringify(attendance));
+ loadEmployees();
+ loadAttendance();
+}
+
+function showPage(id){
+ document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+}
+
+// ATTENDANCE
+function submitAttendance(){
+ const id=document.getElementById('att_id').value.trim();
+ const msg=document.getElementById('att_msg');
+ if(!id){msg.textContent='PLEASE ENTER ID';msg.className='message error';return;}
+ if(!employees[id]){msg.textContent='ID NOT REGISTERED';msg.className='message error';return;}
+ if(!attendance[id]) attendance[id]=[];
+ const now=new Date().toLocaleString();
+ const status = attendance[id].length % 2 === 0 ? 'TIME IN':'TIME OUT';
+ attendance[id].push({status:status,time:now});
+ msg.textContent = status+' SUCCESS: '+now;
+ msg.className='message success';
+ document.getElementById('att_id').value='';
+ save();
+}
+
+// ADMIN - ADD EMPLOYEE
+function addEmployee(){
+ const id=document.getElementById('new_emp_id').value.trim();
+ const name=document.getElementById('new_emp_name').value.trim();
+ if(!id||!name)return alert('Complete fields.');
+ if(employees[id])return alert('ID already exists.');
+ employees[id]=name;
+ save();
+ document.getElementById('new_emp_id').value='';
+ document.getElementById('new_emp_name').value='';
+}
+
+// DELETE EMPLOYEE
+function deleteEmp(id){
+ if(!confirm('Delete employee '+id+'?'))return;
+ delete employees[id];
+ delete attendance[id];
+ save();
+}
+
+// LOAD EMPLOYEES TABLE
+function loadEmployees(){
+ const t=document.getElementById('emp_table');
+ t.innerHTML='';
+ for(const id in employees){
+ t.innerHTML+=`<tr><td>${id}</td><td>${employees[id]}</td>
+ <td><button class='deleteBtn' onclick='deleteEmp("${id}")'>Delete</button></td></tr>`;
+ }
+}
+
+// LOAD ATTENDANCE LOGS
+function loadAttendance(){
+ const box=document.getElementById('att_records');
+ box.innerHTML='';
+ for(const id in attendance){
+ box.innerHTML+=`<strong>${id} - ${employees[id]||'Unknown'}</strong><br>`;
+ attendance[id].slice(-5).forEach(r=>{
+ box.innerHTML+=`${r.status} — ${r.time}<br>`;
+ });
+ box.innerHTML+='<hr>';
+ }
+}
+
+loadEmployees();
+loadAttendance();
+</script>
 </body>
 </html>
