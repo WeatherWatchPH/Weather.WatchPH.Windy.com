@@ -1,1 +1,210 @@
-.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1><i class="fas fa-hand-holding-usd"></i> Loan Manager</h1>
+                <div class="theme-toggle">
+                    <span class="toggle-label">Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="dashboard">
+                <div class="stats-cards">
+                    <div class="stat-card total-loans">
+                        <h3>Total Loans</h3>
+                        <p id="totalLoans">0</p>
+                    </div>
+                    <div class="stat-card total-balance">
+                        <h3>Total Balance</h3>
+                        <p id="totalBalance">$0</p>
+                    </div>
+                    <div class="stat-card upcoming-payment">
+                        <h3>Upcoming Payment</h3>
+                        <p id="upcomingPayment">$0</p>
+                    </div>
+                </div>
+
+                <div class="loan-controls">
+                    <button id="addLoanBtn" class="btn primary">
+                        <i class="fas fa-plus"></i> Add New Loan
+                    </button>
+                    <div class="search-filter">
+                        <input type="text" id="loanSearch" placeholder="Search loans...">
+                        <select id="loanFilter">
+                            <option value="all">All Loans</option>
+                            <option value="active">Active</option>
+                            <option value="paid">Paid Off</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="loan-table-container">
+                    <table id="loanTable">
+                        <thead>
+                            <tr>
+                                <th>Loan Name</th>
+                                <th>Original Amount</th>
+                                <th>Remaining Balance</th>
+                                <th>Interest Rate</th>
+                                <th>Monthly Payment</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loanTableBody">
+                            <!-- Loans will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="loansChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Loan Modal -->
+    <div id="addLoanModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Add New Loan</h2>
+            <form id="loanForm">
+                <div class="form-group">
+                    <label for="loanName">Loan Name</label>
+                    <input type="text" id="loanName" required placeholder="e.g., Car Loan, Mortgage">
+                </div>
+                <div class="form-group">
+                    <label for="loanAmount">Loan Amount ($)</label>
+                    <input type="number" id="loanAmount" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="interestRate">Interest Rate (%)</label>
+                    <input type="number" id="interestRate" min="0" max="100" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="loanTerm">Loan Term (months)</label>
+                    <input type="number" id="loanTerm" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" required>
+                </div>
+                <button type="submit" class="btn primary">Add Loan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loan Details Modal -->
+    <div id="loanDetailsModal" class="modal">
+        <div class="modal-content wide">
+            <span class="close-modal">&times;</span>
+            <div class="loan-details-header">
+                <h2 id="detailLoanName">Loan Details</h2>
+                <div class="loan-status-badge" id="detailLoanStatus"></div>
+            </div>
+            
+            <div class="loan-details-content">
+                <div class="loan-summary">
+                    <div class="summary-item">
+                        <span>Original Amount</span>
+                        <strong id="detailOriginalAmount"></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Remaining Balance</span>
+                        <strong id="detailRemainingBalance"></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Interest Rate</span>
+                        <strong id="detailInterestRate"></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Monthly Payment</span>
+                        <strong id="detailMonthlyPayment"></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Loan Term</span>
+                        <strong id="detailLoanTerm"></strong>
+                    </div>
+                    <div class="summary-item">
+                        <span>Start Date</span>
+                        <strong id="detailStartDate"></strong>
+                    </div>
+                </div>
+                
+                <div class="payment-schedule">
+                    <h3>Payment Schedule</h3>
+                    <div class="schedule-table-container">
+                        <table id="paymentScheduleTable">
+                            <thead>
+                                <tr>
+                                    <th>Payment #</th>
+                                    <th>Date</th>
+                                    <th>Payment</th>
+                                    <th>Principal</th>
+                                    <th>Interest</th>
+                                    <th>Remaining Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paymentScheduleBody">
+                                <!-- Payment schedule will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="payment-actions">
+                    <button id="makePaymentBtn" class="btn primary">
+                        <i class="fas fa-money-bill-wave"></i> Record Payment
+                    </button>
+                    <button id="deleteLoanBtn" class="btn danger">
+                        <i class="fas fa-trash"></i> Delete Loan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Make Payment Modal -->
+    <div id="makePaymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Record Payment</h2>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label for="paymentAmount">Payment Amount ($)</label>
+                    <input type="number" id="paymentAmount" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="paymentDate">Payment Date</label>
+                    <input type="date" id="paymentDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="paymentNote">Notes (Optional)</label>
+                    <textarea id="paymentNote" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn primary">Record Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
