@@ -287,11 +287,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         totalLoansEl.textContent = totalLoans;
-        totalBalanceEl.textContent = `$${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        upcomingPaymentEl.textContent = `$${upcomingPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        totalBalanceEl.textContent = `₱${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        upcomingPaymentEl.textContent = `₱${upcomingPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
     
     function saveLoans() {
         localStorage.setItem('loans', JSON.stringify(loans));
     }
 });
+
