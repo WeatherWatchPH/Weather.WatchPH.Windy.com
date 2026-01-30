@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function setupEventListeners() {
-        // Modal open/close
         addLoanBtn.addEventListener('click', () => addLoanModal.style.display = 'block');
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -38,23 +37,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 makePaymentModal.style.display = 'none';
             });
         });
-        
-        // Close modal when clicking outside
         window.addEventListener('click', (e) => {
             if (e.target === addLoanModal) addLoanModal.style.display = 'none';
             if (e.target === loanDetailsModal) loanDetailsModal.style.display = 'none';
             if (e.target === makePaymentModal) makePaymentModal.style.display = 'none';
         });
-        
-        // Form submissions
         loanForm.addEventListener('submit', handleAddLoan);
         paymentForm.addEventListener('submit', handleMakePayment);
-        
-        // Search and filter
         loanSearch.addEventListener('input', renderLoanTable);
         loanFilter.addEventListener('change', renderLoanTable);
-        
-        // Theme toggle
         themeToggle.addEventListener('change', toggleTheme);
     }
     
@@ -80,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const loanTerm = parseInt(document.getElementById('loanTerm').value);
         const startDate = document.getElementById('startDate').value;
         
-        const monthlyPayment = calculateMonthlyPayment(loanAmount, interestRate, loanTerm);
+        const weeklyPayment = calculateWeeklyPayment(loanAmount, interestRate, loanTerm);
         const paymentSchedule = generatePaymentSchedule(loanAmount, interestRate, loanTerm, startDate);
         
         const newLoan = {
@@ -89,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             originalAmount: loanAmount,
             remainingBalance: loanAmount,
             interestRate: interestRate,
-            monthlyPayment: monthlyPayment,
+            monthlyPayment: weeklyPayment, // keep property name for table
             term: loanTerm,
             startDate: startDate,
             status: 'active',
@@ -102,36 +93,37 @@ document.addEventListener('DOMContentLoaded', function() {
         renderLoanTable();
         updateStats();
         
-        // Reset form and close modal
         loanForm.reset();
         addLoanModal.style.display = 'none';
     }
     
-    function calculateMonthlyPayment(amount, rate, term) {
-        const monthlyRate = rate / 100 / 12;
-        const payment = amount * monthlyRate * Math.pow(1 + monthlyRate, term) / (Math.pow(1 + monthlyRate, term) - 1);
+    // === WEEKLY CALCULATION FUNCTIONS ===
+    
+    function calculateWeeklyPayment(amount, rate, termWeeks) {
+        const weeklyRate = rate / 100 / 52; // annual to weekly
+        const payment = amount * weeklyRate * Math.pow(1 + weeklyRate, termWeeks) / (Math.pow(1 + weeklyRate, termWeeks) - 1);
         return parseFloat(payment.toFixed(2));
     }
     
-    function generatePaymentSchedule(amount, rate, term, startDate) {
+    function generatePaymentSchedule(amount, rate, termWeeks, startDate) {
         const schedule = [];
-        const monthlyRate = rate / 100 / 12;
+        const weeklyRate = rate / 100 / 52;
         let balance = amount;
         const start = new Date(startDate);
+        const weeklyPayment = calculateWeeklyPayment(amount, rate, termWeeks);
         
-        for (let i = 1; i <= term; i++) {
-            const interest = balance * monthlyRate;
-            const principal = calculateMonthlyPayment(amount, rate, term) - interest;
+        for (let i = 1; i <= termWeeks; i++) {
+            const interest = balance * weeklyRate;
+            const principal = weeklyPayment - interest;
             balance -= principal;
             
-            // Calculate payment date
             const paymentDate = new Date(start);
-            paymentDate.setMonth(start.getMonth() + i);
+            paymentDate.setDate(start.getDate() + i * 7);
             
             schedule.push({
                 paymentNumber: i,
                 date: paymentDate.toISOString().split('T')[0],
-                payment: calculateMonthlyPayment(amount, rate, term),
+                payment: parseFloat(weeklyPayment.toFixed(2)),
                 principal: parseFloat(principal.toFixed(2)),
                 interest: parseFloat(interest.toFixed(2)),
                 remainingBalance: Math.max(0, parseFloat(balance.toFixed(2)))
@@ -140,6 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return schedule;
     }
+    
+    // === END WEEKLY CALCULATION FUNCTIONS ===
     
     function renderLoanTable() {
         const searchTerm = loanSearch.value.toLowerCase();
@@ -186,7 +180,6 @@ document.addEventListener('DOMContentLoaded', function() {
             loanTableBody.appendChild(row);
         });
         
-        // Add event listeners to action buttons
         document.querySelectorAll('.view-loan').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const loanId = e.target.closest('tr').dataset.id;
@@ -205,23 +198,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function viewLoanDetails(loanId) {
         currentLoanId = loanId;
         const loan = loans.find(l => l.id === loanId);
-        
         if (!loan) return;
         
-        // Update modal header
         document.getElementById('detailLoanName').textContent = loan.name;
         document.getElementById('detailLoanStatus').className = `loan-status-badge ${loan.status}`;
         document.getElementById('detailLoanStatus').textContent = loan.status === 'active' ? 'Active' : 'Paid Off';
         
-        // Update summary
         document.getElementById('detailOriginalAmount').textContent = `$${loan.originalAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         document.getElementById('detailRemainingBalance').textContent = `$${loan.remainingBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         document.getElementById('detailInterestRate').textContent = `${loan.interestRate}%`;
         document.getElementById('detailMonthlyPayment').textContent = `$${loan.monthlyPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        document.getElementById('detailLoanTerm').textContent = `${loan.term} months`;
+        document.getElementById('detailLoanTerm').textContent = `${loan.term} weeks`;
         document.getElementById('detailStartDate').textContent = new Date(loan.startDate).toLocaleDateString();
         
-        // Update payment schedule
         const paymentScheduleBody = document.getElementById('paymentScheduleBody');
         paymentScheduleBody.innerHTML = '';
         
@@ -238,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
             paymentScheduleBody.appendChild(row);
         });
         
-        // Set up action buttons
         document.getElementById('makePaymentBtn').addEventListener('click', () => {
             loanDetailsModal.style.display = 'none';
             makePaymentModal.style.display = 'block';
@@ -251,42 +239,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Show the modal
         loanDetailsModal.style.display = 'block';
     }
     
     function handleMakePayment(e) {
         e.preventDefault();
-        
         const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
         const paymentDate = document.getElementById('paymentDate').value;
         const paymentNote = document.getElementById('paymentNote').value;
-        
         const loanIndex = loans.findIndex(l => l.id === currentLoanId);
         if (loanIndex === -1) return;
-        
         const loan = loans[loanIndex];
         
-        // Record payment
         loan.payments.push({
             amount: paymentAmount,
             date: paymentDate,
             note: paymentNote
         });
         
-        // Update remaining balance
         loan.remainingBalance = Math.max(0, loan.remainingBalance - paymentAmount);
-        
-        // Update status if paid off
-        if (loan.remainingBalance <= 0) {
-            loan.status = 'paid';
-        }
+        if (loan.remainingBalance <= 0) loan.status = 'paid';
         
         saveLoans();
         renderLoanTable();
         updateStats();
         
-        // Reset form and close modal
         paymentForm.reset();
         makePaymentModal.style.display = 'none';
         loanDetailsModal.style.display = 'block';
@@ -303,12 +280,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateStats() {
         const totalLoans = loans.length;
         const totalBalance = loans.reduce((sum, loan) => sum + loan.remainingBalance, 0);
-        
-        // Find the next payment date (simplified - in a real app, you'd want more complex logic)
         let upcomingPayment = 0;
         const activeLoans = loans.filter(loan => loan.status === 'active');
         if (activeLoans.length > 0) {
-            upcomingPayment = activeLoans[0].monthlyPayment;
+            upcomingPayment = activeLoans[0].monthlyPayment; // now weekly
         }
         
         totalLoansEl.textContent = totalLoans;
