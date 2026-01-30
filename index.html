@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loan Manager</title>
+    <title>PartLending</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -27,7 +27,7 @@
             <div class="dashboard">
                 <div class="stats-cards">
                     <div class="stat-card total-loans">
-                        <h3>Total Loans</h3>
+                        <h3>Total Borrower</h3>
                         <p id="totalLoans">0</p>
                     </div>
                     <div class="stat-card total-balance">
@@ -42,12 +42,12 @@
 
                 <div class="loan-controls">
                     <button id="addLoanBtn" class="btn primary">
-                        <i class="fas fa-plus"></i> Add New Loan
+                        <i class="fas fa-plus"></i> Add New Borrower 
                     </button>
                     <div class="search-filter">
                         <input type="text" id="loanSearch" placeholder="Search loans...">
                         <select id="loanFilter">
-                            <option value="all">All Loans</option>
+                            <option value="all">All Borrower</option>
                             <option value="active">Active</option>
                             <option value="paid">Paid Off</option>
                         </select>
@@ -59,10 +59,10 @@
                         <thead>
                             <tr>
                                 <th>Loan Name</th>
-                                <th>Original Amount</th>
+                                <th>Principal Amount</th>
                                 <th>Remaining Balance</th>
                                 <th>Interest Rate</th>
-                                <th>Monthly Payment</th>
+                                <th>Weekly Payment</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -84,7 +84,7 @@
     <div id="addLoanModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <h2>Add New Loan</h2>
+            <h2>Add New Borrower</h2>
             <form id="loanForm">
                 <div class="form-group">
                     <label for="loanName">Loan Name</label>
@@ -99,7 +99,7 @@
                     <input type="number" id="interestRate" min="0" max="100" step="0.01" required>
                 </div>
                 <div class="form-group">
-                    <label for="loanTerm">Loan Term (months)</label>
+                    <label for="loanTerm">Loan Term (Weeks)</label>
                     <input type="number" id="loanTerm" min="1" required>
                 </div>
                 <div class="form-group">
@@ -123,7 +123,7 @@
             <div class="loan-details-content">
                 <div class="loan-summary">
                     <div class="summary-item">
-                        <span>Original Amount</span>
+                        <span>Principal Amount</span>
                         <strong id="detailOriginalAmount"></strong>
                     </div>
                     <div class="summary-item">
@@ -135,7 +135,7 @@
                         <strong id="detailInterestRate"></strong>
                     </div>
                     <div class="summary-item">
-                        <span>Monthly Payment</span>
+                        <span>Weekly Payment</span>
                         <strong id="detailMonthlyPayment"></strong>
                     </div>
                     <div class="summary-item">
@@ -188,7 +188,7 @@
             <h2>Record Payment</h2>
             <form id="paymentForm">
                 <div class="form-group">
-                    <label for="paymentAmount">Payment Amount ($)</label>
+                    <label for="paymentAmount">Payment Amount (₱)</label>
                     <input type="number" id="paymentAmount" min="1" required>
                 </div>
                 <div class="form-group">
@@ -209,3 +209,4 @@
 </body>
 
 </html>
+
